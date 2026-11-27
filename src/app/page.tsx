@@ -73,7 +73,9 @@ export default function Home() {
         med.times.map((time) => ({
           med,
           time,
-          status: logs.find((l) => l.medId === med.id && l.date === date && l.time === time)?.status,
+          status: logs.find(
+            (l) => l.medId === med.id && l.date === date && l.time === time,
+          )?.status,
         })),
       )
       .sort((a, b) => a.time.localeCompare(b.time));
@@ -84,8 +86,13 @@ export default function Home() {
   function logDose(medId: string, time: string, status: "taken" | "missed") {
     if (!date) return;
     setLogs((prev) => {
-      const rest = prev.filter((l) => !(l.medId === medId && l.date === date && l.time === time));
-      return [{ id: crypto.randomUUID(), medId, date, time, status }, ...rest];
+      const rest = prev.filter(
+        (l) => !(l.medId === medId && l.date === date && l.time === time),
+      );
+      return [
+        { id: crypto.randomUUID(), medId, date, time, status },
+        ...rest,
+      ];
     });
   }
 
@@ -197,9 +204,13 @@ export default function Home() {
         </section>
       )}
 
-      {tab === "meds" && <MedList meds={meds} onAdd={addMed} onRemove={removeMed} />}
+      {tab === "meds" && (
+        <MedList meds={meds} onAdd={addMed} onRemove={removeMed} />
+      )}
       {tab === "history" && <History logs={logs} meds={meds} />}
-      {tab === "family" && <Family slots={slots} done={done} total={slots.length} />}
+      {tab === "family" && (
+        <Family slots={slots} done={done} total={slots.length} />
+      )}
 
       <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-[#e4dccf] bg-white/95 backdrop-blur">
         <div className="mx-auto grid max-w-lg grid-cols-4">
@@ -330,7 +341,9 @@ function MedList({
 }
 
 function History({ logs, meds }: { logs: DoseLog[]; meds: Medication[] }) {
-  const nameOf = (id: string) => meds.find((m) => m.id === id)?.name ?? "삭제된 약";
+  const nameOf = (id: string) =>
+    meds.find((m) => m.id === id)?.name ?? "삭제된 약";
+
   if (logs.length === 0) {
     return (
       <p className="rounded-2xl bg-white px-4 py-8 text-center text-lg text-[#6b645b] ring-1 ring-[#e4dccf]">
@@ -338,13 +351,18 @@ function History({ logs, meds }: { logs: DoseLog[]; meds: Medication[] }) {
       </p>
     );
   }
+
   return (
     <ul className="flex flex-col gap-2">
       {logs.slice(0, 30).map((log) => (
-        <li key={log.id} className="rounded-2xl bg-white px-4 py-3 ring-1 ring-[#e4dccf]">
+        <li
+          key={log.id}
+          className="rounded-2xl bg-white px-4 py-3 ring-1 ring-[#e4dccf]"
+        >
           <p className="text-lg font-bold">{nameOf(log.medId)}</p>
           <p className="text-base text-[#6b645b]">
-            {log.date} {log.time} · {log.status === "taken" ? "먹음" : "못 먹음"}
+            {log.date} {log.time} ·{" "}
+            {log.status === "taken" ? "먹음" : "못 먹음"}
           </p>
         </li>
       ))}
@@ -362,6 +380,7 @@ function Family({
   total: number;
 }) {
   const pending = slots.filter((s) => !s.status);
+
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center gap-3 rounded-2xl bg-[#0f6e6a] px-4 py-5 text-white">
@@ -374,7 +393,8 @@ function Family({
         </div>
       </div>
       <p className="text-base leading-relaxed text-[#6b645b]">
-        같은 휴대폰에서 보호자가 확인하는 화면입니다. 아직 체크하지 않은 약만 보여 줍니다.
+        같은 휴대폰에서 보호자가 확인하는 화면입니다. 아직 체크하지 않은 약만
+        보여 줍니다.
       </p>
       {pending.length === 0 ? (
         <p className="rounded-2xl bg-white px-4 py-8 text-center text-lg text-[#6b645b] ring-1 ring-[#e4dccf]">
@@ -382,7 +402,10 @@ function Family({
         </p>
       ) : (
         pending.map((slot) => (
-          <article key={`${slot.med.id}-${slot.time}`} className="rounded-2xl bg-[#f8e6d8] px-4 py-4">
+          <article
+            key={`${slot.med.id}-${slot.time}`}
+            className="rounded-2xl bg-[#f8e6d8] px-4 py-4"
+          >
             <p className="text-sm font-semibold text-[#c45c26]">{slot.time}</p>
             <h2 className="text-2xl font-bold">{slot.med.name}</h2>
             <p className="text-lg text-[#6b645b]">{slot.med.dosage}</p>
