@@ -26,8 +26,8 @@ const seed: Medication[] = [
   { id: "m2", name: "당뇨약", dosage: "1정", times: ["08:30"], note: "아침 식사 직후" },
 ];
 
-function todayKey(d = new Date()) {
-  const y = d.getFullYear();
+function todayKey(d: Date) {
+  const y = d.get.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
@@ -41,7 +41,11 @@ export default function Home() {
   const [logs, setLogs] = useState<DoseLog[]>([]);
   const [banner, setBanner] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
-  const date = todayKey();
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    setDate(todayKey(new Date()));
+  }, []);
 
   useEffect(() => {
     try {
@@ -63,6 +67,7 @@ export default function Home() {
   }, [meds, logs, ready]);
 
   const slots = useMemo(() => {
+    if (!date) return [];
     return meds
       .flatMap((med) =>
         med.times.map((time) => ({
@@ -77,12 +82,10 @@ export default function Home() {
   const done = slots.filter((s) => s.status === "taken").length;
 
   function logDose(medId: string, time: string, status: "taken" | "missed") {
+    if (!date) return;
     setLogs((prev) => {
       const rest = prev.filter((l) => !(l.medId === medId && l.date === date && l.time === time));
-      return [
-        { id: crypto.randomUUID(), medId, date, time, status },
-        ...rest,
-      ];
+      return [{ id: crypto.randomUUID(), medId, date, time, status }, ...rest];
     });
   }
 
@@ -92,6 +95,14 @@ export default function Home() {
 
   function removeMed(id: string) {
     setMeds((prev) => prev.filter((m) => m.id !== id));
+  }
+
+  if (!date) {
+    return (
+      <main className="mx-auto flex min-h-dvh w-full max-w-lg items-center justify-center bg-[#f4efe6] px-4 text-[#1c1915]">
+        <p className="text-lg text-[#6b645b]">불러오는 중…</p>
+      </main>
+    );
   }
 
   return (
